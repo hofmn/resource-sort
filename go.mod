@@ -1,3 +1,3 @@
-module unifrom-ressources
+module unifrom-ressource
 
 go 1.23.4

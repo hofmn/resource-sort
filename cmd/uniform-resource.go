@@ -6,21 +6,19 @@ import (
 	"strings"
 )
 
-const (
-	filePathInput  string = "test.txt"
-	filePathOutput string = "output.txt"
-)
-
 func main() {
-	sortAndFormatFile(filePathInput, filePathOutput)
+	filePaths := os.Args[1:]
+	for _, path := range filePaths {
+		sortAndFormatFile(path)
+	}
 }
 
-func sortAndFormatFile(filePathInput, filePathOutput string) {
-	content := mustReadFile(filePathInput)
+func sortAndFormatFile(filePath string) {
+	content := mustReadFile(filePath)
 	sortedLines := sortFileByLines(content)
 	longestKeyLength := getLongestKeyLength(sortedLines)
 	formatedLines := formatLines(sortedLines, longestKeyLength)
-	mustWriteFile(filePathOutput, formatedLines)
+	mustWriteFile(filePath, formatedLines)
 }
 
 func mustWriteFile(filePathOutput string, content []string) {
