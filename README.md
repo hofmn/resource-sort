@@ -1,5 +1,6 @@
 # Go Programm für einheitliche Resource Dateien
-Dieses Programm sortiert eine Datei zeilenweise und formartiert sie nach dem Muster: `KEY = VALUE`.
+Dieses Programm sortiert eine Datei zeilenweise und formartiert sie.
+Die Datei muss nach dem Muster: `KEY = VALUE` aufgebaut sein.
 
 ## Verwendung
 
