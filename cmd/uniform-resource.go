@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"slices"
 	"strings"
@@ -83,7 +84,7 @@ func isLineEmpty(line string) bool {
 
 func formatLine(line string, longestKeyLength int) string {
 	key := addSpacesBehindKey(getKey(line), longestKeyLength)
-	value := replaceUmlauts(getVal(line))
+	value := replaceSpecialChars(getVal(line))
 	newLine := []string{key, "= ", value, "\n"}
 	return strings.Join(newLine, "")
 }
@@ -94,22 +95,22 @@ func addSpacesBehindKey(key string, longestKeyLength int) string {
 	return strings.Join([]string{key, spacesToAdd}, " ")
 }
 
-func replaceUmlauts(val string) string {
-	replacements := map[string]string{
-		"ä": "\\u00E4",
-		"Ä": "\\u00C4",
-		"ü": "\\u00FC",
-		"Ü": "\\u00DC",
-		"ö": "\\u00F6",
-		"Ö": "\\u00D6",
-		"ß": "\\u00DF",
-	}
-	if strings.ContainsAny(val, "äÄüÜöÖß") {
-		for old, new := range replacements {
-			val = strings.ReplaceAll(val, old, new)
+func replaceSpecialChars(val string) string {
+	var result strings.Builder
+	result.Grow(len(val) * 2) // Pre-allocate space for efficiency
+
+	for _, r := range val {
+		// Check if the character is in the ASCII range
+		if r <= 127 {
+			result.WriteRune(r)
+			continue
 		}
+
+		// For any non-ASCII character, convert to Unicode escape sequence
+		result.WriteString(fmt.Sprintf("\\u%04X", r))
 	}
-	return val
+
+	return result.String()
 }
 
 func getVal(line string) string {
