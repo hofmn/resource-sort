@@ -19,6 +19,9 @@ func sortAndFormatFile(filePath string) {
 	sortedLines := sortFileByLines(content)
 	longestKeyLength := getLongestKeyLength(sortedLines)
 	formatedLines := formatLines(sortedLines, longestKeyLength)
+	if isLineEmpty(formatedLines[0]) {
+		formatedLines = formatedLines[1:]
+	}
 	mustWriteFile(filePath, formatedLines)
 }
 
@@ -64,12 +67,17 @@ func getLongestKeyLength(lines []string) int {
 
 func formatLines(lines []string, longestKeyLength int) []string {
 	var newLines []string
-	for _, line := range lines {
+	for i, line := range lines {
 		if isLineEmpty(line) {
 			continue
 		}
 		newLine := formatLine(line, longestKeyLength)
-		newLines = append(newLines, newLine)
+		if compareFirstWordFromKeys(getKey(lines[i-1]), getKey(lines[i])) {
+			newLines = append(newLines, newLine)
+		} else {
+			newLines = append(newLines, "\n")
+			newLines = append(newLines, newLine)
+		}
 	}
 	return newLines
 }
@@ -98,21 +106,24 @@ func addSpacesBehindKey(key string, longestKeyLength int) string {
 func replaceSpecialChars(val string) string {
 	var result strings.Builder
 	result.Grow(len(val) * 2) // Pre-allocate space for efficiency
-
 	for _, r := range val {
 		// Check if the character is in the ASCII range
 		if r <= 127 {
 			result.WriteRune(r)
 			continue
 		}
-
 		// For any non-ASCII character, convert to Unicode escape sequence
 		result.WriteString(fmt.Sprintf("\\u%04X", r))
 	}
-
 	return result.String()
 }
 
 func getVal(line string) string {
 	return strings.TrimSpace(strings.SplitAfter(line, "=")[1])
+}
+
+func compareFirstWordFromKeys(key1 string, key2 string) bool {
+	word1 := strings.Split(key1, "_")
+	word2 := strings.Split(key2, "_")
+	return word1[0] == word2[0]
 }
