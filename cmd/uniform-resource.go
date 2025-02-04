@@ -7,10 +7,38 @@ import (
 	"strings"
 )
 
+const (
+	LF   = "\n"
+	CRLF = "\r\n"
+)
+
+var lineSeparator string
+var filePaths []string
+
 func main() {
-	filePaths := os.Args[1:]
+	setLineSeparator()
+	setFilePaths()
 	for _, path := range filePaths {
 		sortAndFormatFile(path)
+	}
+}
+
+func setLineSeparator() {
+	switch strings.ToLower(os.Args[1]) {
+	case "--lf":
+		lineSeparator = LF
+	case "--crlf":
+		lineSeparator = CRLF
+	default:
+		lineSeparator = LF
+	}
+}
+
+func setFilePaths() {
+	if strings.Contains(os.Args[1], "--") {
+		filePaths = os.Args[2:]
+	} else {
+		filePaths = os.Args[1:]
 	}
 }
 
@@ -23,17 +51,6 @@ func sortAndFormatFile(filePath string) {
 		formatedLines = formatedLines[1:]
 	}
 	mustWriteFile(filePath, formatedLines)
-}
-
-func mustWriteFile(filePathOutput string, content []string) {
-	file, err := os.Create(filePathOutput)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-	for _, s := range content {
-		file.WriteString(s)
-	}
 }
 
 func mustReadFile(filePath string) string {
@@ -75,15 +92,11 @@ func formatLines(lines []string, longestKeyLength int) []string {
 		if compareFirstWordFromKeys(getKey(lines[i-1]), getKey(lines[i])) {
 			newLines = append(newLines, newLine)
 		} else {
-			newLines = append(newLines, "\n")
+			newLines = append(newLines, lineSeparator)
 			newLines = append(newLines, newLine)
 		}
 	}
 	return newLines
-}
-
-func getKey(line string) string {
-	return strings.TrimSpace(strings.Split(line, "=")[0])
 }
 
 func isLineEmpty(line string) bool {
@@ -93,7 +106,7 @@ func isLineEmpty(line string) bool {
 func formatLine(line string, longestKeyLength int) string {
 	key := addSpacesBehindKey(getKey(line), longestKeyLength)
 	value := replaceSpecialChars(getVal(line))
-	newLine := []string{key, "= ", value, "\n"}
+	newLine := []string{key, "= ", value, lineSeparator}
 	return strings.Join(newLine, "")
 }
 
@@ -101,6 +114,10 @@ func addSpacesBehindKey(key string, longestKeyLength int) string {
 	numberSpacesToAdd := longestKeyLength - len(key)
 	spacesToAdd := strings.Repeat(" ", numberSpacesToAdd)
 	return strings.Join([]string{key, spacesToAdd}, " ")
+}
+
+func getKey(line string) string {
+	return strings.TrimSpace(strings.Split(line, "=")[0])
 }
 
 func replaceSpecialChars(val string) string {
@@ -126,4 +143,15 @@ func compareFirstWordFromKeys(key1 string, key2 string) bool {
 	word1 := strings.Split(key1, "_")
 	word2 := strings.Split(key2, "_")
 	return word1[0] == word2[0]
+}
+
+func mustWriteFile(filePathOutput string, content []string) {
+	file, err := os.Create(filePathOutput)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	for _, s := range content {
+		file.WriteString(s)
+	}
 }

@@ -5,15 +5,21 @@ Wenn der Key aus mehrern Wörtern besteht, dasnn sollte er mit `_` getrennt sein
 
 ## Verwendung
 
+### Flags
+- **--LF** : Setzt den Zeilenumbruch auf LF `\n`
+- **--CRLF** : Setzt den Zeilenumbruch auf CRLF `\r\n`
+
+Standardmäßig wird der Zeilenumbruch auf LF gesetzt.
+
 ### Binary
 Die Binary ist die perfomanteste und einfachste Möglichkeit. Lade die Binary herunter und führe sie über ein Terminal deiner Wahl aus. Gebe die zu sortierenden Datein mit ihrem Dateipfad als Option an.
 
-`.\unifrom-resource.exe <filePath1> <filePath2> ...`
+`.\unifrom-resource.exe <optional:flag> <filePath1> <filePath2> ...`
 
 ### Mithilfe von go run
 1. [Installiere go](https://go.dev/doc/install)
 2. Lade dir das Repo herunter.
-3. `go run cmd\unifrom-resource.go <filePath1> ...`
+3. `go run cmd\unifrom-resource.go <optional:flag> <filePath1> ...`
 
 ## Formatierung
 Die Formatierung funktioniert wie folgt:
